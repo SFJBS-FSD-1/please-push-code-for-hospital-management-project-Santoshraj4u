@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for, flash
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from http import HTTPStatus
@@ -63,70 +63,105 @@ class Patient(db.Model):
 
 #------------------------------------------- Resources ------------------------------------------------------#
 
-# Default page -- Home
+# Default page -- Home -- Done
 @app.route("/")
 def homepage():
     return render_template("home.html")
 
 
-
-# Selecting all data
+# Selecting all data -- Done
 @app.route("/getAllPatients", methods = ['GET'])
 def getAllPatients():
     data = Patient.get_patient()
     return render_template("AllPatients.html", data=data)
 
 
-# Getting patient data from phonenumber
-@app.route("/get_patient_by_id", methods = ['GET'])
+# Getting patient data from phonenumber -- Done
+@app.route("/get_patient_by_id", methods = ['GET','POST'])
 def get_patient_by_id():
-    dd = request.get_json()
-    data = Patient.get_patient2(dd.phonenumber)
-    print(data)
-    res=[]
-    if data != None:
-        res.append({"name":data.name, "phonenumber":data.phonenumber,
-                    "age": data.age, "bedtype": data.bedtype, "address": data.address,
-                    "state": data.state, "city": data.city, "patientstatus": data.patientstatus})
-        return(jsonify(res))
+    if request.method == 'POST':
+        phone = request.form['phonenumber']
+
+        dd = request.get_json()
+        data = Patient.get_patient2(dd.phonenumber)
+        print(data)
+        res=[]
+        if data != None:
+            res.append({"name":data.name, "phonenumber":data.phonenumber,
+                        "age": data.age, "bedtype": data.bedtype, "address": data.address,
+                        "state": data.state, "city": data.city, "patientstatus": data.patientstatus})
+            return redirect(url_for('FindPatient'))
+        else:
+            return render_template('FindPatient.html')
     else:
-        return jsonify({'message':'Not found', 'status':HTTPStatus.NOT_FOUND})
+        return render_template('FindPatient.html')
 
 
-# Inserting data
-@app.route("/register_patient", methods = ['POST'])
+# Inserting data -- Done
+@app.route("/register_patient", methods = ['GET','POST'])
 def register_patient():
-    data = request.get_json()
-    print(data)
-    Patient.add_patient(name = data["name"], phonenumber = data["phonenumber"],
-                        age = data["age"], bedtype = data["bedtype"], address = data["address"],
-                        state = data["state"], city = data["city"], patientstatus = data["patientstatus"])
-    return jsonify({'message':'Patient Registered', 'status':HTTPStatus.OK})
+    if request.method == 'POST':
+        name = request.form['name']
+        phonenumber = request.form['phonenumber']
+        age = request.form['age']
+        bedtype = request.form['bedtype']
+        address = request.form['address']
+        state = request.form['state']
+        city = request.form['city']
+        patientstatus = request.form['patientstatus']
 
-# Updating data
-@app.route("/edit_patient", methods = ['PUT'])
+        pat = Patient.query.filter_by(phonenumber=phonenumber).first()
+
+        if pat == None:
+            patient = Patient(name=name, phonenumber=phonenumber, age=age, bedtype=bedtype, address=address, state=state,
+                               city=city, patientstatus=patientstatus)
+            db.session.add(patient)
+            db.session.commit()
+            flash('Patient creation initiated successfully')
+            return redirect(url_for('update_patient'))
+
+        else:
+            flash('Patient with this ID already exists')
+            return redirect(url_for('Register.html'))
+    else:
+        return render_template('Register.html')
+
+
+# Updating data -- Done
+@app.route("/edit_patient", methods = ['GET','PUT'])
 def edit_patient():
-    data = request.get_json()
-    result = Patient.update_Patient_by_id(id,data["name"], data["phonenumber"],
-                                 data["age"],data["bedtype"],data["address"],
-                                 data["state"],data["city"],data["patientstatus"])
-    if result:
-        return jsonify({'message': 'Updated', 'status': HTTPStatus.OK})
+    updatep = Patient.query.all()
+
+    if not updatep:
+        flash('No patients exists in database')
+        return redirect(url_for('Register'))
     else:
-        return jsonify({'message':'Not found', 'status':HTTPStatus.NOT_FOUND})
+        print("inside else")
+        return render_template('UpdatePatient.html', updatep=updatep)
 
 
-# Deleting data
-@app.route("/delete_patient", methods = ['DELETE'])
+# Deleting data -- Done
+@app.route("/delete_patient", methods = ['GET','DELETE'])
 def delete_patient():
-    dd = request.get_json()
-    data = Patient.delete_patient_by_id(dd['phonenumber'])
-    if data:
-        return jsonify({'message':'Deleted', 'status':HTTPStatus.OK})
-    else:
-        return jsonify({'message':'Not found', 'status':HTTPStatus.NOT_FOUND})
+    deletep = Patient.query.all()
 
+    if not deletep:
+        flash('No patients exists in database')
+        return redirect(url_for('Register'))
+    else:
+        print("inside else")
+        return render_template('DeletePatient.html', deletep=deletep)
+
+# Active Patient -- Done
+@app.route('/active_patient', methods = ['GET','DELETE'])
+def active_patient():
+        pts = Patient.query.filter_by(patientstatus='Active')
+        if not pts:
+            flash('All Patients Discharged')
+            return redirect(url_for('update_patient'))
+        else:
+            return render_template('ActivePatient.html', pts=pts)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5002)
