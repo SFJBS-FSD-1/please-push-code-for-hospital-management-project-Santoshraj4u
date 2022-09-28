@@ -7,22 +7,38 @@
         table, th, td {
           border: 1px solid black;
         }
-</style>
+    </style>
 </head>
 
 <body>
     <h1>Details of the Patients</h1>
+    <hr>
     <table>
         <tr>
             <th>Name</th>
-            <th>Phonenumber</th>
+            <th>Phone Number</th>
+            <th>Age</th>
+            <th>Bed Type</th>
+            <th>Address</th>
+            <th>State</th>
+            <th>City</th>
+            <th>Patient Status</th>
         </tr>
             {% for dd in data %}
                 <tr>
                 <td>{{ dd.name }}</td>
                 <td>{{ dd.phonenumber }}</td>
+                <td>{{ dd.age }}</td>
+                <td>{{ dd.bedtype }}</td>
+                <td>{{ dd.address }}</td>
+                <td>{{ dd.state }}</td>
+                <td>{{ dd.city }}</td>
+                <td>{{ dd.patientstatus }}</td>
             {% endfor %}
                 </tr>
     </table>
+<hr>
+<a href="javascript:history.back()">Go Back</a>&emsp;
+<a href="/"> Home Page </a>
 </body>
 </html>

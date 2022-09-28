@@ -5,6 +5,62 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Welcome to Sans Hospital!!</h1>
+    <h1 style="color: blue">Welcome to Sans Hospital!!</h1>
+    <hr>
+    <br><br><br><br>
+        <form method="get" action="/getAllPatients">
+         <div>
+            <button type="submit"> All Patient List </button>
+         </div>
+        </form>
+
+        <br><br>
+
+        <form method="get" action="/get_patient_by_id">
+             <div>
+                <button type="submit"> Find Patient </button>
+             </div>
+        </form>
+
+        <br><br>
+
+        <form method="get" action="/register_patient">
+            <div>
+                <button type="submit"> Register Patient </button>
+            </div>
+        </form>
+
+        <br><br>
+
+        <form method="get" action="/edit_patient">
+            <div>
+                <button type="submit"> Edit Patient </button>
+            </div>
+        </form>
+
+        <br><br>
+
+        <form method="get" action="/delete_patient">
+            <div>
+                <button type="submit"> Delete Patient </button>
+            </div>
+        </form>
+
+        <br><br>
+
+        <form method="get" action="/active_patient">
+            <div>
+                <button type="submit"> Active Patient </button>
+            </div>
+        </form>
+
+    <br><br><br><br>
+    <hr>
+    <a href="getAllPatients"> All Patient List </a>&emsp;
+    <a href="get_patient_by_id"> Find Patient </a>&emsp;
+    <a href="register_patient"> Register Patient </a>&emsp;
+    <a href="edit_patient"> Update Patient Details</a>&emsp;
+    <a href="delete_patient"> Delete Patient</a>&emsp;
+    <a href="active_patient"> Active Patients </a>
 </body>
 </html>
