@@ -60,6 +60,19 @@ class Patient(db.Model):
             print("No Patient with this phone num")
             return None
 
+    @staticmethod
+    def patient_data(phonenumber=None):
+        phone = request.form["phonenumber"]
+        patient = Patient.query.filter_by(phonenumber=phonenumber).first()
+        patient_data = {}
+        if patient:
+            patient_data = {'id': patient.id, 'name': patient.name, 'phonenumber': patient.phonenumber,
+                            'age': patient.age, 'bedtype': patient.bedtype,
+                            'address': patient.address, 'state': patient.state,
+                            'city': patient.city, 'patientstatus': patient.patientstatus,
+                            }
+        return patient_data
+
 
 #------------------------------------------- Resources ------------------------------------------------------#
 
@@ -117,50 +130,69 @@ def register_patient():
                                city=city, patientstatus=patientstatus)
             db.session.add(patient)
             db.session.commit()
-            flash('Patient creation initiated successfully')
-            return redirect(url_for('update_patient'))
+            #flash('Patient creation initiated successfully')
+            return render_template('Register.html')
 
         else:
-            flash('Patient with this ID already exists')
-            return redirect(url_for('Register.html'))
+            #flash('Patient with this ID already exists')
+            return render_template('Register.html')
     else:
         return render_template('Register.html')
 
 
 # Updating data -- Done
-@app.route("/edit_patient", methods = ['GET','PUT'])
+@app.route("/edit_patient", methods = ['GET','POST'])
 def edit_patient():
-    updatep = Patient.query.all()
+    return render_template("UpdatePatient.html");
+    pass
 
-    if not updatep:
-        flash('No patients exists in database')
-        return redirect(url_for('Register'))
-    else:
-        print("inside else")
-        return render_template('UpdatePatient.html', updatep=updatep)
+    # if request.method == 'POST':
+    #     phonenumber = request.form['phonenumber']
+    #
+    #     data = Patient.query.filter_by(phonenumber=phonenumber).first()
+    #
+    #     if data:
+    #         patient_data = {'name':data.name, 'phonenumber':data.phonenumber,
+    #                 'age':data.age, 'bedtype':data.bedtype, 'address':data.address,
+    #                 'state':data.state, 'city':data.city, 'patientstatus':data.patientstatus
+    #                 }
+    #         return render_template("UpdatePatient.html", update_msg=patient_data)
+    #     else:
+    #         return render_template("UpdatePatient.html", msg="Patient not Found")
 
 
 # Deleting data -- Done
-@app.route("/delete_patient", methods = ['GET','DELETE'])
+@app.route("/delete_patient", methods = ['GET','POST'])
 def delete_patient():
-    deletep = Patient.query.all()
+    if request.method == 'POST':
+        phonenumber = request.form["phonenumber"]
+        patient = Patient.query.filter_by(phonenumber=phonenumber).first()
 
-    if not deletep:
-        flash('No patients exists in database')
-        return redirect(url_for('Register'))
+        if patient:
+            Patient.query.filter_by(phonenumber=phonenumber).delete()
+            db.session.commit()
+            #return render_template("DeletePatient.html", msg = patient.name +" Deleted successfully")
+            return render_template("DeletePatient.html")
+        else:
+            #return render_template("DeletePatient.html", msg = "Patient not found")
+            return render_template("DeletePatient.html")
     else:
-        print("inside else")
-        return render_template('DeletePatient.html', deletep=deletep)
+        return render_template("DeletePatient.html")
 
 # Active Patient -- Done
-@app.route('/active_patient', methods = ['GET','DELETE'])
+@app.route('/active_patient', methods = ['GET','POST'])
 def active_patient():
-        pts = Patient.query.filter_by(patientstatus='Active')
-        if not pts:
-            flash('All Patients Discharged')
-            return redirect(url_for('update_patient'))
-        else:
-            return render_template('ActivePatient.html', pts=pts)
+    # if request.method == 'GET':
+    #     patients_list = Patient.get_patient()
+    #     active_patients = []
+    #
+    #     for patient in patients_list:
+    #         if patient['patientstatus'] == 'Active':
+    #             active_patients.append(patient)
+    #     return render_template("ActivePatient.html", patient=active_patients)
+    data = Patient.get_patient()
+    return render_template("ActivePatient.html", data=data)
+
 
 
 if __name__ == "__main__":

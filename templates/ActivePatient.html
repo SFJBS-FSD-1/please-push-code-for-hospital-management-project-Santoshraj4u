@@ -1,59 +1,44 @@
- {% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Active Patients</title>
+    <style>
+        table, th, td {
+          border: 1px solid black;
+        }
+    </style>
+</head>
 
-{% block title %} Account Status {% endblock %}
-
-{% block content %}
-
-<div class="astatus">
-
-    <h1 style="color: rgb(255, 0, 0);">Active Patients</h1><br>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                <p style="color: rgb(255, 5, 5);text-align: center; font-weight: bolder;"> {{ msg }} </p>
-            {% endfor %}
-        {% endif %}
-    {% endwith%}
-
-
+<body>
+    <h1>Active Patients</h1>
+    <hr>
     <table>
         <tr>
-            <th>ID</th>
-            <th>NAME</th>
-            <th>PHONE NUMBER</th>
-            <th>AGE</th>
-            <th>BED TYPE</th>
-            <th>ADDRESS</th>
-            <th>CITY</th>
-            <th>STATE</th>
-            <th>PATIENT STATUS</th>
-            <th></th>
-            
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Age</th>
+            <th>Bed Type</th>
+            <th>Address</th>
+            <th>State</th>
+            <th>City</th>
+            <th>Patient Status</th>
         </tr>
-        {% for update in pts %}
-        <tr>
-            <td> {{ update.id }} </td>
-            <td> {{ update.name }} </td>
-            <td> {{ update.phonenumber }} </td>
-            <td> {{ update.age }} </td>
-            <td> {{ update.bedtype }} </td>
-            <td> {{ update.address }}</td>
-            <td> {{ update.city }} </td>
-            <td> {{ update.state }} </td>
-            <td> {{ update.patientstatus }} </td>
-            <td> <button type="button" class="ubutton" onclick="window.location='edit_patient/{{ update.id }}'"> Update Patient </button> </td>
-        </tr>
-        {% else %}
-
-                <h3>No Active Patients!</h3>
-        {% endfor %}
+            {% for dd in data %}
+                <tr>
+                <td>{{ dd.name }}</td>
+                <td>{{ dd.phonenumber }}</td>
+                <td>{{ dd.age }}</td>
+                <td>{{ dd.bedtype }}</td>
+                <td>{{ dd.address }}</td>
+                <td>{{ dd.state }}</td>
+                <td>{{ dd.city }}</td>
+                <td>{{ dd.patientstatus }}</td>
+            {% endfor %}
+                </tr>
     </table>
-    <br>
-
-    <form action="{{ url_for('patientscreen') }}">
-    <button type="submit" class="ibutton" value="Refresh the list">Refresh Status</button>
-    </form>
-</div>
-
-{% endblock %}
+<hr>
+<a href="javascript:history.back()">Go Back</a>&emsp;
+<a href="/"> Home Page </a>
+</body>
+</html>
